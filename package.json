@@ -14,8 +14,15 @@
   "contributes": {
     "commands": [
       {
-        "command": "start",
-        "title": "Start"
+        "command": "keyTracker.start",
+        "title": "KeyTracker.Start"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "keyTracker.start",
+        "key": "ctrl+shift+t",
+        "when": "editorTextFocus"
       }
     ]
   },
