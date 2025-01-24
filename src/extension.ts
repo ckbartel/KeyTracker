@@ -18,13 +18,12 @@ export function activate(context: vscode.ExtensionContext) {
 			const changes = event.contentChanges; // Array of changes made
 
 			changes.forEach((change) => {
-				change.rangeOffset
 				console.log('Change detected:');
 				console.log(`Range: ${JSON.stringify(change.range)}`);
 				if (change.text === '') {
 					//if change was deletion
 					const deletedText = getDeletedText(previousText, change);
-					console.log(`Text deleted: ${deletedText}`);
+					console.log(`Text deleted: "${deletedText}"`);
 				} else {
 					//if change was insertion
 					console.log(`Text inserted: "${change.text}"`);
