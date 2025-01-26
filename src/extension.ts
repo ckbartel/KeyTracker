@@ -14,13 +14,14 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log("Change detected:");
 			console.log(`Date: ${currDate.toISOString()}`)
 			console.log(`File: ${event.document.uri.fsPath}`);
-			console.log(`Position: ${change.rangeOffset}`);
 			if (change.text === '') {
 				//if change was deletion
+				console.log(`Position: ${change.rangeOffset}`);
 				console.log(`Delete: ${change.rangeLength}\n`);
 			} else {
 				//if change was insertion
 				//note: the rangeLength gives how many characters were deleted in the change, so slicing it off fixese auto completions!!!
+				console.log(`Position: ${change.rangeOffset + change.rangeLength}`);
 				console.log(`Insert: ${change.text.slice(change.rangeLength)}\n`);
 			}
 
