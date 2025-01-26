@@ -2,24 +2,6 @@ import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("Extension running\n");
-	const activeEditor = vscode.window.activeTextEditor;
-
-	let previousText: string = '';
-
-	if (activeEditor) {
-		//if there is a document opened, capture its text
-		previousText = activeEditor.document.getText();
-		console.log(`Initial document loaded: ${activeEditor.document.uri.fsPath}\n`);
-	}
-
-	//listen to active document change
-	const activeEditorChangeListener = vscode.window.onDidChangeActiveTextEditor((editor) => {
-		if (editor) {
-			//if there is still a document opened
-			previousText = editor.document.getText();
-			console.log(`Active document changed: ${editor.document.uri.fsPath}\n`);
-		}
-	});
 
 	//listen to text document changes (insertions, deletions, etc.)
 	const textChangeListener = vscode.workspace.onDidChangeTextDocument((event) => {
@@ -27,22 +9,22 @@ export function activate(context: vscode.ExtensionContext) {
 
 		changes.forEach((change) => {
 
+			let currDate = new Date();
+
 			console.log("Change detected:");
+			console.log(`Date: ${currDate.toISOString()}`)
 			console.log(`File: ${event.document.uri.fsPath}`);
-			console.log(`Range: ${JSON.stringify(change.range)}`);
+			console.log(`Position: ${change.rangeOffset}`);
 			if (change.text === '') {
 				//if change was deletion
-				const deletedText = getDeletedText(previousText, change);
-				console.log(`Text deleted: "${deletedText}"\n`);
+				console.log(`Delete: ${change.rangeLength}\n`);
 			} else {
 				//if change was insertion
-				console.log(`Text inserted: "${change.text}"\n`);
+				//note: the rangeLength gives how many characters were deleted in the change, so slicing it off fixese auto completions!!!
+				console.log(`Insert: ${change.text.slice(change.rangeLength)}\n`);
 			}
 
 		});
-		
-		//update previous text
-		previousText = event.document.getText();
 	});
 
 	//listen for save events
@@ -54,21 +36,13 @@ export function activate(context: vscode.ExtensionContext) {
 			diagnostics.forEach((diagnostic) => {
 				console.log(`[${diagnostic.severity}] ${diagnostic.message} ${JSON.stringify(diagnostic.range)}`);
 			});
-			console.log();
+			console.log("");
 		}, 1000);
 	});
 
 	//add listeners to context subscriptions
-	context.subscriptions.push(textChangeListener, activeEditorChangeListener, saveListener);
+	context.subscriptions.push(textChangeListener, saveListener);
 
-}
-
-//gets deleted text given previous text and the change made
-function getDeletedText(previousText: string, change: vscode.TextDocumentContentChangeEvent) : string {
-	//use the change.rangeOffset and change.rangeLength directly to slice the deleted text from the previous text
-    const deletedText = previousText.slice(change.rangeOffset, change.rangeOffset + change.rangeLength);
-
-    return deletedText;
 }
 
 export function deactivate() {}
